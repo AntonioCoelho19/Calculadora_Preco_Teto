@@ -20,6 +20,33 @@ def exibe_relatorio(dados):
     input("Aperte qualquer tecla para voltar para o menu inicial")
     return
 
+def consulta(acao, codigo):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM precoTeto WHERE nm_acao = ?",(acao,))
+    resultado = cursor.fetchone()
+
+    if resultado:
+        if codigo == 1:
+            print("Exibindo as informações da ação escolhida...")
+            exibe_relatorio(resultado)
+            return
+        else:
+            confirmacao = input(f"Tem certeza que deseja excluir o registro da ação {acao}? [s]im ou [n]ão:").lower().startswith('s')
+            if confirmacao:
+                cursor.execute("DELETE FROM precoTeto WHERE nm_acao = ?",(acao,))
+                db.commit()
+                print(f"Registro da ação {acao} excluído com sucesso!")
+                time.sleep(5)
+                return
+            else:
+                print("Operação cancelada. Retornando para o menu principal...")
+                time.sleep(3)
+                return
+    else:
+        print("Nenhum registro encontrado!!! Retornando para o menu principal...")
+        time.sleep(3)
+        return
+
 
 def calcular():
     os.system('cls')
@@ -50,29 +77,28 @@ def relatorio():
     escolha = input("Deseja ver o relátorio de uma ação específica? [s]im ou [n]ão: ").lower().startswith('s')
     if escolha:
         acao = input("Digite o ticker da ação desejada: ").upper()
-        cursor.execute("SELECT * FROM precoTeto WHERE nm_acao = ?",(acao,))
-        resultado = cursor.fetchone()
-
-        if resultado:
-            print("Exibindo as informações da ação escolhida...")
-            exibe_relatorio(resultado)
-            return
-        else:
-            print("Nenhum registro encontrado!!! Retornando para o menu principal...")
-            time.sleep(5)
-            return
+        consulta(acao, codigo=1)
+        return
         
     else:
         cursor.execute("SELECT * FROM precoTeto")
         dados = cursor.fetchall()
         if len(dados) == 0:
             print("Nenhum registro encontrado!!! Retornando para o menu principal...")
-            time.sleep(5)
+            time.sleep(3)
             return
         else:
             exibe_relatorio(dados)
             return
+
+def atualizar():
+    print('Você escolheu Atualizar Preço-Teto\n')
     
+def excluir():
+    os.system('cls')
+    acao = input("Digite o ticker da ação que deseja excluir: ").upper()
+    consulta(acao, codigo=2)
+    return
 
 while True:
     os.system("cls")
@@ -89,6 +115,16 @@ while True:
         calcular()
     elif opcao == 2:
         relatorio()
-    else:
+    elif opcao == 3:
+        atualizar()
+    elif opcao == 4:
+        excluir()
+
+    elif opcao == 5:
+        print("Encerrando o programa...")
         db.close()
         break
+    
+    else:
+        print("Opção inválida! Tente novamente.")
+        time.sleep(1)
