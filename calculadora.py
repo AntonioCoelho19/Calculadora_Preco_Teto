@@ -62,7 +62,7 @@ def calcular():
     lpa = lucroProjetivo / qtdePapeis
     dpa = lpa * payout
     precoTeto = dpa / yieldMinimo
-    margemSeguranca = ((precoTeto - precoAtual) / precoTeto) * 100
+    margemSeguranca = ((precoTeto - precoAtual) / precoAtual) * 100
 
     db.execute("INSERT INTO precoTeto VALUES(NULL,?,?,?,?,?,?,?,?,?)",(ticker, precoAtual, qtdePapeis, yieldMinimo, payout, lucroProjetivo, lpa, precoTeto, margemSeguranca))
     db.commit()
